@@ -2,7 +2,11 @@
 
 sudo apt update #更新库
 sudo apt -y install curl #安装curl
-sudo apt -y install ffmpeg #安装ffmpeg
+
+#安装ffmpeg
+wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz
+sudo tar -C /usr/local -xvf ffmpeg-release-amd64-static.tar.xz ; rm -ffmpeg ffmpeg-release-amd64-static.tar.xz
+sudo mv /usr/local/ffmpeg-4.3-amd64-static/ffmpeg /usr/local/ffmpeg-4.3-amd64-static/ffprobe /usr/local/bin/
 
 #安装python3相关下载工具
 sudo apt -y install python3 ; sudo apt -y install python3-pip ; sudo apt -y install python3-setuptools #安装python3
