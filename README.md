@@ -117,7 +117,7 @@ __處理（可跳過)__
 在這其中，[驗證Youtube登入](https://policies.google.com/technologies/types?hl=ja)只需要`SID`、`SSID`、`HSID`這三個Cookies類型。您可以只留下這三個類型的行數。  
 請注意，如果您使用的是FireFox的cookies.txt擴充功能，您應當刪除`#HttpOnly_.`這部分內容。  
 
-最終您的Cookies.txt檔案的內容應該與下方類似。
+最終您的cookies.txt檔案的內容應該與下方類似。
 ```
 .youtube.com	TRUE	/	FALSE	0000000000	SID	xxx 
 .youtube.com	TRUE	/	FALSE	0000000000	HSID	xxx
@@ -126,7 +126,7 @@ __處理（可跳過)__
 
 ### __如何使用__
 
-在準備好Cookies.txt檔案后,請您將Cookies.txt放在與存放record.sh相同的資料夾內。  
+在準備好cookies.txt檔案后,請您將Cookies.txt放在與存放record.sh相同的資料夾內。  
 直接運行record.sh可以檢查是否生效。  
 如果已經生效：
 ```
@@ -144,3 +144,6 @@ record.sh  livedl
 ...
 當前YouTube未登入（授權已過期)。
 ```
+
+__請注意__  
+在您變更Google賬戶密碼、在獲取cookies的瀏覽器上退出賬戶等賬戶安全相關敏感操作后可能會導致cookies直接失效。
