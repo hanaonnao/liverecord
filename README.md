@@ -69,7 +69,78 @@ bilibili|`bilibili`、`bilibiliproxy`|`直播間網址中的ID部分`(如1223592
 :---|:---|:---|:---|:---
 第三個參數|清晰度|`best`|`清晰度1,清晰度2`，可以用,分隔來指定多個清晰度|僅支援streamlink含有的清晰度，將會依次獲取嘗試直到獲取第一個可用的清晰度
 第四個參數|是否迴圈和錄製分段時間|`loop`|`once`或`分段秒數`|如果指定為once則會在檢測到直播並進行一次錄製後終止，如果指定為數位則會以loop模式進行錄製並在在錄製進行相應秒數時分段。 __注意分段時可能會有十秒左右的視頻缺失__
-第五個參數|迴圈檢測間隔和最短錄製間隔和錄製開始所需連續檢測開播次數|`10,10,1`|`迴圈檢測間隔秒數,最短錄製間隔秒數,錄製開始所需連續檢測開播次數`，如果不以,分隔則最短錄製間隔也為此值而錄製開始所需連續檢測開播次數為1|迴圈檢測間隔是指如果未檢測到直播，則等待相應時間進行下一次檢測；最短錄製間隔是指如果一次錄製結束後，如果距離錄製開始小於最短錄製間隔，則等待到最短錄製間隔進行下一次檢測。最短錄製間隔主要是為了防止檢測到直播但錄製出錯的情況，此時一次錄製結束如果立即進行下一次檢測可能會因為檢測過於頻繁導致被封禁IP或者導致高系統佔用，這種情況可能出現在網站改版等特殊時期，需要注意的是如果一次直播時間過短或者頻繁斷流也能觸發等待；錄製開始所需連續檢測開播次數是指需要連續檢測到相應次數的開播才會開始錄製，可以用於預防一些檢測到直播狀態實際卻並沒有直播的情況。
+第五個參數|迴圈檢測間隔和最短錄製間隔和錄製開始所需連續檢測開播次數|`10,10,1,20`|`迴圈檢測間隔秒數,最短錄製間隔秒數,錄製開始所需連續檢測開播次數,每次檢測隨機增加時間的範圍`，如果不以,分隔則最短錄製間隔也為此值而錄製開始所需連續檢測開播次數為1|迴圈檢測間隔是指如果未檢測到直播，則等待相應時間進行下一次檢測；最短錄製間隔是指如果一次錄製結束後，如果距離錄製開始小於最短錄製間隔，則等待到最短錄製間隔進行下一次檢測；每次檢測隨機增加時間的範圍則是在檢測間隔的基礎上每次隨機增加幾秒時間，如果不指定則默認範圍是增加0-19秒。最短錄製間隔以及每次檢測隨機增加時間的範圍主要是為了防止檢測到直播但錄製出錯的情況，此時一次錄製結束如果立即進行下一次檢測可能會因為檢測過於頻繁導致被封禁IP或者導致高系統佔用，這種情況可能出現在網站改版等特殊時期，需要注意的是如果一次直播時間過短或者頻繁斷流也能觸發等待；錄製開始所需連續檢測開播次數是指需要連續檢測到相應次數的開播才會開始錄製，可以用於預防一些檢測到直播狀態實際卻並沒有直播的情況。
 第六個參數|本地錄影存放目錄|`record_video/other`|`本地目錄`||
 第七個參數|是否自動備份|`nobackup`|`rclone:網盤名稱:` + `onedrive` + `baidupan` + `重試次數` + `無/keep/del`，不需要空格直接連接在一起即可(如rclone1del或rclone:vps:onedrivebaidupan3keep)|其中前三項的rclone、onedrive、baidupan分別指上傳rclone相應名稱的網盤、OneDriveUploader登錄的onedrive網盤、BaiduPCS-Go登錄的百度雲網盤。第四項為重試次數，如果不指定則默認為嘗試一次。第五項為上傳完成後是否保留本地檔，如果不指定則上傳成功將刪除本地檔，上傳失敗將保留本地檔，keep參數為不論結果始終保留本地檔，del參數為不論結果始終刪除本地檔。如果因為偶發的檢測異常導致沒有直播時開始錄製，進而產生沒有相應錄影檔的log檔，腳本將會自動刪除這個沒有對應錄影檔的log檔
 第八至十四個參數|bilibili的錄製需要排除的轉播|`noexcept`|`相應頻道號碼`，具體同第二個參數，順序分別為youtube、twitcast、twitch、openrec、nicolv、nicoco、nicoch、mirrativ、reality、17live、chaturbate、streamlink|僅bilibili錄製有效，檢測到相應頻道正在直播時不進行bilibili的錄製
+
+# 可選擇設置
+
+## Youtube可選功能 - Cookies.txt檔案
+由於Youtube對於機器檢測的不確定性，在使用Youtube錄製時有一定的幾率會發生429 Too Many Requests的錯誤。  
+通常發生這種錯誤是因為彈出了reCaptcha的驗證系統，__目前沒有官方描述檔稱__ 登入后就可以 __降低reCaptcha驗證系統出現的可能__，但是在出現了429錯誤后Youtube-DL只需要傳入登入Youtube后的Cookies.txt檔案即可正常進行下載Youtube的內容。
+ 
+如果您出現了429 Too Many Requests的錯誤，您可以嘗試此方法。   
+如果您有需求錄製成員限定的直播，您也可以嘗試此方法。  
+
+### __如何生成Cookies.txt__ 
+
+__準備__  
+如果您使用Chrome抑或是使用基於Chromium內核的瀏覽器,您可以[點擊此處](https://chrome.google.com/webstore/detail/cookiestxt/njabckikapfpffapmjgojcnbfjonfjfg)安裝cookies.txt擴充功能。  
+如果您使用FireFox瀏覽器,您可以[點擊此處](https://addons.mozilla.org/ja/firefox/addon/cookies-txt/)安裝cookies.txt擴充功能。  
+
+__獲取__  
+在安裝好擴充功能后，您需要打開[Youtube賬戶](https://www.youtube.com/account),然後使用擴充功能進行獲取Cookies.txt的操作。  
+如果您使用的是Chrome抑或是使用基於Chromium內核的瀏覽器的cookies.txt擴充功能，請選擇 `download cookies for this tab`后的`click here`。  
+如果您使用的是FireFox的cookies.txt擴充功能，請選擇 `Current Site`。  
+
+__處理（可跳過)__  
+您下載好后的的Cookies應當諸如以下的格式,並且將會有超過5個以上的Cookies的類型。  
+```
+.youtube.com	TRUE	/	TRUE	0000000000	VISITOR_INFO1_LIVE	xxx 
+.youtube.com	TRUE	/	FALSE	0000000000	_ga	xxx 
+.youtube.com	TRUE	/	FALSE	0000000000	PREF	xxx 
+.youtube.com	TRUE	/	FALSE	0000000000	_gcl_au	xxx 
+.youtube.com	TRUE	/	FALSE	0000000000	SID	xxx 
+.youtube.com	TRUE	/	TRUE	0000000000	__Secure-3PSID	xxx
+.youtube.com	TRUE	/	FALSE	0000000000	HSID	xxx
+.youtube.com	TRUE	/	TRUE	0000000000	SSID	xxx
+.youtube.com	TRUE	/	FALSE	0000000000	APISID	xxx
+.youtube.com	TRUE	/	TRUE	0000000000	__Secure-HSID	xxx
+.youtube.com	TRUE	/	TRUE	0000000000	__Secure-SSID	xxx
+.youtube.com	TRUE	/	TRUE	0000000000	__Secure-APISID	xxx
+.youtube.com	TRUE	/	TRUE	0000000000	__Secure-3PAPISID	xxx
+.youtube.com	TRUE	/	TRUE	0000000000	LOGIN_INFO	xxx
+.youtube.com	TRUE	/	TRUE	0	YSC	xxx
+.youtube.com	TRUE	/	FALSE	0000000000	SIDCC	xxx
+```
+在這其中，[驗證Youtube登入](https://policies.google.com/technologies/types?hl=ja)只需要`SID`、`SSID`、`HSID`這三個Cookies類型。您可以只留下這三個類型的行數。  
+請注意，如果您使用的是FireFox的cookies.txt擴充功能，您應當刪除`#HttpOnly_.`這部分內容。  
+
+最終您的Cookies.txt檔案的內容應該與下方類似。
+```
+.youtube.com	TRUE	/	FALSE	0000000000	SID	xxx 
+.youtube.com	TRUE	/	FALSE	0000000000	HSID	xxx
+.youtube.com	TRUE	/	TRUE	0000000000	SSID	xxx
+```
+
+### __如何使用__
+
+在準備好Cookies.txt檔案后,請您將Cookies.txt放在與存放record.sh相同的資料夾內。  
+直接運行record.sh可以檢查是否生效。  
+如果已經生效：
+```
+[root@hanaon record]# ls
+record.sh  cookies.txt  livedl
+[root@hanaon record]# ./record.sh 
+...
+當前YouTube已登入（授權尚未過期),預計過期時間為2022-07-08,請注意及時更新Cookies。
+```
+如果未生效:
+```
+[root@hanaon record]# ls
+record.sh  livedl
+[root@hanaon record]# ./record.sh 
+...
+當前YouTube未登入（授權已過期)。
+```
