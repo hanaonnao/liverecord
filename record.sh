@@ -1,12 +1,19 @@
 #!/bin/bash
 
 if [[ ! -n "${1}" ]]; then
-	echo "${0} youtube|youtubeffmpeg|twitcast|twitcastffmpeg|twitcastpy|twitch|openrec|nicolv[:用户名,密码]|nicoco[:用户名,密码]|nicoch[:用户名,密码]|mirrativ|reality|17live|chaturbate|bilibili|bilibiliproxy[,代理ip:代理端口]|streamlink|m3u8 \"频道号码\" [best|其他清晰度] [loop|once|视频分段时间] [10,10,1|循环检测间隔,最短录制间隔,录制开始所需连续检测开播次数] [\"record_video/other|其他本地目录\"] [nobackup|rclone:网盘名称:|onedrive|baidupan[重试次数][keep|del]] [\"noexcept|排除转播的youtube频道号码\"] [\"noexcept|排除转播的twitcast频道号码\"] [\"noexcept|排除转播的twitch频道号码\"] [\"noexcept|排除转播的openrec频道号码\"] [\"noexcept|排除转播的nicolv频道号码\"] [\"noexcept|排除转播的nicoco频道号码\"] [\"noexcept|排除转播的nicoch频道号码\"] [\"noexcept|排除转播的mirrativ频道号码\"] [\"noexcept|排除转播的reality频道号码\"] [\"noexcept|排除转播的17live频道号码\"] [\"noexcept|排除转播的chaturbate频道号码\"] [\"noexcept|排除转播的streamlink支持的频道网址\"]"
-	echo "示例：${0} bilibiliproxy,127.0.0.1:1080 \"12235923\" best,1080p60,1080p,720p,480p,360p,worst 14400 15,5,2 \"record_video/mea_bilibili\" rclone:vps:onedrivebaidupan3keep \"UCWCc8tO-uUl_7SJXIKJACMw\" \"kaguramea\" \"kagura0mea\" \"KaguraMea\" "
-	echo "必要模块为curl、streamlink、ffmpeg，可选模块为livedl、python3、you-get，请将livedl文件放置于运行时目录的livedl文件夹内、请将record_twitcast.py文件放置于运行时目录的record文件夹内。"
-	echo "rclone上传基于\"https://github.com/rclone/rclone\"，onedrive上传基于\"https://github.com/MoeClub/OneList/tree/master/OneDriveUploader\"，百度云上传基于\"https://github.com/iikira/BaiduPCS-Go\"，请登录后使用。"
-	echo "注意使用youtube直播仅支持1080p以下的清晰度，请不要使用best和1080p60及以上的参数"
-	echo "仅bilibili支持排除转播功能"
+	echo "使用方法請查看"
+	echo "https://github.com/hanaonnao/liverecord/blob/master/README.md"
+	echo "使用前請確保curl、streamlink、ffmpeg等基礎環境已經安裝；上傳模塊请登录后使用。目前仅bilibili支援排除轉播功能"
+	echo "注意使用youtube直播仅支持1080p以下的清晰度，请不要使用1080p60及以上的参数。如果需要登入請將Cookies.txt檔案放在本腳本同目錄下"
+	echo "登入后可以某種程度上減少彈出ReCaptcha或者降低是被Ban的可能，但不是絕對的。由於Cookies會過期，請記得定時檢查登入狀態是否失效"
+	echo "如果需要檢查請不帶任何參數直接運行本腳本"
+	if (wget -x --load-cookies cookies.txt -q -O- "https://www.youtube.com/account"  | grep -q '\"LOGGED_IN\":true'); then
+	Timestamp=$(grep SID cookies.txt|awk '{if( NR == 1 ) print $5}')
+	Expiration=$(date -d @${Timestamp}  "+%Y-%m-%d")
+    echo "當前YouTube已登入（授權尚未過期),預計過期時間為$Expiration"
+	else
+    echo "當前YouTube未登入（授權已過期),請及時更新Cookies"
+	fi
 	exit 1
 fi
 if [[ "${1}" == "twitcast" || "${1}" == "nicolv"* || "${1}" == "nicoco"* || "${1}" == "nicoch"* ]]; then
@@ -69,7 +76,9 @@ EXCEPT_STREAM_PART_URL="${19:-noexcept}"
 [[ "${EXCEPT_CHATURBATE_PART_URL}" == "noexcept" ]] || EXCEPT_CHATURBATE_FULL_URL="https://chaturbate.com/${EXCEPT_CHATURBATE_PART_URL}/"
 [[ "${EXCEPT_STREAM_PART_URL}" == "noexcept" ]] || EXCEPT_STREAM_FULL_URL="${EXCEPT_STREAM_PART_URL}"
 
-
+Cookies1=$(grep SID cookies.txt|awk '{if( NR == 1 ) print $6}')"="$(grep SID cookies.txt|awk -v RS='\r\n' '{if( NR == 1 ) print $7}')
+Cookies2=$(grep SSID cookies.txt|awk '{if( NR == 1 ) print $6}')"="$(grep SSID cookies.txt|awk -v RS='\r\n' '{if( NR == 1 ) print $7}')
+Cookies3=$(grep HSID cookies.txt|awk '{if( NR == 1 ) print $6}')"="$(grep HSID cookies.txt|awk -v RS='\r\n' '{if( NR == 1 ) print $7}')
 
 LIVE_STATUS=0
 #ISLIVE_YOUTUBE=0
@@ -81,15 +90,11 @@ while true; do
 		LOG_PREFIX=$(date +"[%Y-%m-%d %H:%M:%S]") ; echo "${LOG_PREFIX} metadata ${FULL_URL}"
 		if [[ "${1}" == "youtube"* ]]; then
 			LOG_PREFIX=$(date +"[%Y-%m-%d %H:%M:%S]") ; echo "${LOG_PREFIX} metadata RANLOOPINTERVAL=${TURELOOPINTERVAL}"
-			#if [[ ${ISLIVE_YOUTUBE} -gt 0 ]]; then
-			STREAM_URL=$(streamlink --stream-url "${FULL_URL}" "${FORMAT}")
-			if (echo "${STREAM_URL}" | grep -Eq ".m3u8|.flv|rtmp:|The stream specified cannot be translated to a URL"); then 
-				let LIVE_STATUS++; 
-				echo "${STREAM_URL}"
-			else 
-				LIVE_STATUS=0; 
-				echo "${STREAM_URL}"
-			fi
+				if (wget -x --load-cookies cookies.txt -q -O- "${FULL_URL}" | grep "ytplayer" | grep -q '\\"isLive\\":true'); then
+					let LIVE_STATUS++ ;
+				else
+					LIVE_STATUS=0 ; 
+				fi
 			#(wget -q -O- "${FULL_URL}" | grep -q '\\"playabilityStatus\\":{\\"status\\":\\"OK\\"') && break
 		fi
 		if [[ "${1}" == "twitcast"* ]]; then
@@ -114,9 +119,10 @@ while true; do
 		fi
 		if [[ "${1}" == "nicoch"* ]]; then
 			LIVE_URL=$(wget -q -O- "https://ch.nicovideo.jp/${PART_URL}/live" | awk 'BEGIN{RS="<section class=";FS="\n";ORS="\n";OFS="\t"} $1 ~ /sub now/ {LIVE_POS=match($0,"https://live.nicovideo.jp/watch/lv[0-9]*");LIVE=substr($0,LIVE_POS,RLENGTH);print LIVE}' | head -n 1)
-			if [[ -n "${LIVE_URL}" ]]; then let LIVE_STATUS++; else LIVE_STATUS=0; fi
-			LIVE_ID=$(wget -q -O- "https://ch.nicovideo.jp/${PART_URL}" | grep -o "data-live_id=\"[0-9]*\" data-live_status=\"onair\"" | head -n 1 | awk -F'"' '{print $2}') ; LIVE_URL="https://live.nicovideo.jp/watch/lv${LIVE_ID}"
-			if [[ -n "${LIVE_ID}" ]]; then let LIVE_STATUS++; else LIVE_STATUS=0; fi
+			if [[ -n "${LIVE_URL}" ]]; then let LIVE_STATUS++; else
+				LIVE_ID=$(wget -q -O- "https://ch.nicovideo.jp/${PART_URL}" | grep -o "data-live_id=\"[0-9]*\" data-live_status=\"onair\"" | head -n 1 | awk -F'"' '{print $2}') ; LIVE_URL="https://live.nicovideo.jp/watch/lv${LIVE_ID}"
+				if [[ -n "${LIVE_ID}" ]]; then let LIVE_STATUS++; else LIVE_STATUS=0; fi
+			fi
 		fi
 		
 		if [[ "${1}" == "mirrativ" ]]; then
@@ -128,8 +134,8 @@ while true; do
 			if [[ -n "${STREAM_ID}" ]]; then let LIVE_STATUS++; else LIVE_STATUS=0; fi
 		fi
 		if [[ "${1}" == "17live" ]]; then
-			LIVE_STATUS=$(curl -s -X POST 'http://api-dsa.17app.co/api/v1/liveStreams/getLiveStreamInfo' --data "{\"liveStreamID\": ${PART_URL}}" | grep -o '\\"closeBy\\":\\"\\"')
-			if [[ -n "${LIVE_STATUS}" ]]; then let LIVE_STATUS++; else LIVE_STATUS=0; fi
+			STREAM_URL=$(curl -s -X POST "https://api-dsa.17app.co/api/v1/lives/${PART_URL}/viewers/alive" --data-raw "{\"liveStreamID\": \"${PART_URL}\"}" | grep -o '"webUrl":"[^"]*' | awk -F'\"' '{print $4}')
+			if [[ -n "${STREAM_URL}" ]]; then let LIVE_STATUS++; else LIVE_STATUS=0; fi
 		fi
 		if [[ "${1}" == "chaturbate" ]]; then
 			LIVE_URL=$(curl -s "https://chaturbate.com/${PART_URL}/" | grep -o "https://edge[0-9]*.stream.highwebmedia.com.*/playlist.m3u8" | sed 's/\\u002D/-/g')
@@ -193,8 +199,8 @@ while true; do
 				fi
 				if [[ "${EXCEPT_17LIVE_PART_URL}" != "noexcept" ]]; then
 					LOG_PREFIX=$(date +"[%Y-%m-%d %H:%M:%S]") ; echo "${LOG_PREFIX} metadata ${EXCEPT_17LIVE_FULL_URL}"
-					EXCEPT_17LIVE_LIVE_STATUS=$(curl -s -X POST 'http://api-dsa.17app.co/api/v1/liveStreams/getLiveStreamInfo' --data "{\"liveStreamID\": ${EXCEPT_17LIVE_PART_URL}}" | grep -o '\\"closeBy\\":\\"\\"')
-					[[ -n "${EXCEPT_17LIVE_LIVE_STATUS}" ]] && echo "${LOG_PREFIX} restream from ${EXCEPT_17LIVE_FULL_URL} retry after ${TURELOOPINTERVAL} seconds..." && sleep ${TURELOOPINTERVAL} && continue
+					EXCEPT_17LIVE_STREAM_URL=$(curl -s -X POST "https://api-dsa.17app.co/api/v1/lives/${EXCEPT_17LIVE_PART_URL}/viewers/alive" --data-raw "{\"liveStreamID\": \"${EXCEPT_17LIVE_PART_URL}\"}" | grep -o '"webUrl":"[^"]*' | awk -F'\"' '{print $4}')
+					[[ -n "${EXCEPT_17LIVE_STREAM_URL}" ]] && echo "${LOG_PREFIX} restream from ${EXCEPT_17LIVE_FULL_URL} retry after ${LOOPINTERVAL} seconds..." && sleep ${LOOPINTERVAL} && continue
 				fi
 				if [[ "${EXCEPT_CHATURBATE_PART_URL}" != "noexcept" ]]; then
 					EXCEPT_CHATURBATE_LIVE_URL=$(curl -s "https://chaturbate.com/${EXCEPT_CHATURBATE_PART_URL}/" | grep -o "https://edge[0-9]*.stream.highwebmedia.com.*/playlist.m3u8" | sed 's/\\u002D/-/g')
@@ -224,8 +230,8 @@ while true; do
 	
 	
 	
-	if [[ "${1}" == "youtube"* ]]; then ID=$(wget -q -O- "${FULL_URL}" | grep -o '\\"liveStreamabilityRenderer\\":{\\"videoId\\":\\".*\\"' | head -n 1 | sed 's/\\//g' | awk -F'"' '{print $6}') ; FNAME="youtube_${PART_URL}_$(date +"%Y%m%d_%H%M%S")_${ID}.ts"; echo "225";fi
-	if [[ "${1}" == "youtubeffmpeg" ]]; then STREAM_URL=$(streamlink --stream-url "${FULL_URL}" "${FORMAT}"); fi
+	if [[ "${1}" == "youtube"* ]]; then ID=$(wget -x --load-cookies cookies.txt -q -O- "${FULL_URL}" | grep -o '\\"liveStreamabilityRenderer\\":{\\"videoId\\":\\".*\\"' | head -n 1 | sed 's/\\//g' | awk -F'"' '{print $6}') ; FNAME="youtube_${PART_URL}_$(date +"%Y%m%d_%H%M%S")_${ID}.ts"; echo "225";fi
+	if [[ "${1}" == "youtubeffmpeg" ]]; then STREAM_URL=$(streamlink --http-cookie "${Cookies1}" --http-cookie "${Cookies2}" --http-cookie "${Cookies3}" --stream-url "${FULL_URL}" "${FORMAT}"); fi
 	if [[ "${1}" == "twitcast"* ]]; then ID=$(wget -q -O- "https://twitcasting.tv/streamserver.php?target=${PART_URL}&mode=client" | grep -o '"id":[0-9]*' | awk -F':' '{print $2}') ; DLNAME="${PART_URL/:/：}_${ID}.ts" ; FNAME="twitcast_${PART_URL/:/：}_$(date +"%Y%m%d_%H%M%S")_${ID}.ts"; fi
 	if [[ "${1}" == "twitcastffmpeg" ]]; then STREAM_URL=$(wget -q -O- "https://twitcasting.tv/${PART_URL}/metastream.m3u8?mode=source" | grep ".m3u8" | head -n 1); fi
 	if [[ "${1}" == "twitcastpy" ]]; then STREAM_URL="wss://$(wget -q -O- "https://twitcasting.tv/streamserver.php?target=${PART_URL}&mode=client" | grep -o '"fmp4":{"host":"[^"]*"' | awk -F'"' '{print $6}')/ws.app/stream/${ID}/fmp4/bd/1/1500?mode=source"; fi
@@ -236,7 +242,7 @@ while true; do
 	
 	if [[ "${1}" == "mirrativ" ]]; then STREAM_URL=$(wget -q -O- "https://www.mirrativ.com/api/live/live?live_id=${LIVE_URL}" | grep -o '"streaming_url_hls":".*m3u8"' | awk -F'"' '{print $4}') ; FNAME="mirrativ_${PART_URL}_$(date +"%Y%m%d_%H%M%S").ts"; fi
 	if [[ "${1}" == "reality" ]]; then ID=$(echo ${STREAM_ID} | awk -F'"' '{print $8}') ; STREAM_URL=$(echo ${STREAM_ID} | awk -F'"' '{print $4}') ; FNAME="reality_${ID}_$(date +"%Y%m%d_%H%M%S").ts"; fi
-	if [[ "${1}" == "17live" ]]; then STREAM_URL=$(curl -s -X POST 'http://api-dsa.17app.co/api/v1/liveStreams/getLiveStreamInfo' --data "{\"liveStreamID\": ${PART_URL}}" | grep -o '\\"webUrl\\":\\"[^\\]*' | awk -F'\"' '{print $4}') ; FNAME="17live_${PART_URL}_$(date +"%Y%m%d_%H%M%S").ts"; fi
+	if [[ "${1}" == "17live" ]]; then FNAME="17live_${PART_URL}_$(date +"%Y%m%d_%H%M%S").ts"; fi
 	if [[ "${1}" == "chaturbate" ]]; then STREAM_URL="${LIVE_URL/playlist.m3u8/}$(curl -s "${LIVE_URL}" | tail -n 1)" ; FNAME="chaturbate_${PART_URL}_$(date +"%Y%m%d_%H%M%S").ts"; fi
 	if [[ "${1}" == "streamlink" ]]; then FNAME="stream_$(date +"%Y%m%d_%H%M%S").ts"; fi
 
@@ -260,9 +266,9 @@ while true; do
 	
 	if [[ "${1}" == "youtube" ]]; then
 		#if [[ ${ISLIVE_YOUTUBE_BEFORE} -gt 0 ]]; then
-		#	(streamlink --loglevel trace -o "${DIR_LOCAL}/${FNAME}" "https://www.youtube.com/watch?v=${ID}" "${FORMAT}" > "${DIR_LOCAL}/${FNAME}.log" 2>&1) &
+			#(streamlink --loglevel trace -o "${DIR_LOCAL}/${FNAME}" "https://www.youtube.com/watch?v=${ID}" "${FORMAT}" > "${DIR_LOCAL}/${FNAME}.log" 2>&1) &
 		#else
-		(streamlink --loglevel trace --hls-live-restart -o "${DIR_LOCAL}/${FNAME}" "https://www.youtube.com/watch?v=${ID}" "${FORMAT}" > "${DIR_LOCAL}/${FNAME}.log" 2>&1) &
+		(streamlink --http-cookie "${Cookies1}" --http-cookie "${Cookies2}" --http-cookie "${Cookies3}" --loglevel trace --hls-live-restart -o "${DIR_LOCAL}/${FNAME}" "https://www.youtube.com/watch?v=${ID}" "${FORMAT}" > "${DIR_LOCAL}/${FNAME}.log" 2>&1) &
 		#fi
 	fi
 	
