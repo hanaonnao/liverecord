@@ -30,7 +30,7 @@ STREAM_PROXY_HARD=$(echo "${1}" | awk -F"," '{print $2}')
 PART_URL="${2}" #频道号码
 FORMAT="${3:-best}" #清晰度
 LOOP_TIME="${4:-loop}" #是否循环或视频分段时间
-LOOPINTERVAL_ENDINTERVAL_LIVESTATUSMIN="${5:-10,10,1}" ; LOOPINTERVAL=$(echo "${LOOPINTERVAL_ENDINTERVAL_LIVESTATUSMIN}" | awk -F"," '{print $1}'); ENDINTERVAL=$(echo "${LOOPINTERVAL_ENDINTERVAL_LIVESTATUSMIN}" | awk -F"," '{print $2}'); [[ "${ENDINTERVAL}" == "" ]] && ENDINTERVAL=${LOOPINTERVAL} ; LIVESTATUSMIN=$(echo "${LOOPINTERVAL_ENDINTERVAL_LIVESTATUSMIN}" | awk -F"," '{print $3}') ; [[ "${LIVESTATUSMIN}" == "" ]] && LIVESTATUSMIN=1 #循环检测间隔,最短录制间隔,录制开始所需连续检测开播次数
+LOOPINTERVAL_ENDINTERVAL_LIVESTATUSMIN_RANTIME="${5:-10,10,1,20}" ; LOOPINTERVAL=$(echo "${LOOPINTERVAL_ENDINTERVAL_LIVESTATUSMIN_RANTIME}" | awk -F"," '{print $1}'); ENDINTERVAL=$(echo "${LOOPINTERVAL_ENDINTERVAL_LIVESTATUSMIN_RANTIME}" | awk -F"," '{print $2}'); [[ "${ENDINTERVAL}" == "" ]] && ENDINTERVAL=${LOOPINTERVAL} ; LIVESTATUSMIN=$(echo "${LOOPINTERVAL_ENDINTERVAL_LIVESTATUSMIN_RANTIME}" | awk -F"," '{print $3}') ; [[ "${LIVESTATUSMIN}" == "" ]] && LIVESTATUSMIN=1 ; RANTIME=$(echo "${LOOPINTERVAL_ENDINTERVAL_LIVESTATUSMIN_RANTIME}" | awk -F"," '{print $4}') ; [[ "${RANTIME}" == "" ]] && RANTIME=20 #循环检测间隔,最短录制间隔,录制开始所需连续检测开播次数
 DIR_LOCAL="${6:-record_video/other}" ; mkdir -p "${DIR_LOCAL}" #本地目录
 BACKUP="${7:-nobackup}" #自动备份
 BACKUP_DISK="$(echo "${BACKUP}" | awk -F":" '{print $1}')$(echo "${BACKUP}" | awk -F":" '{print $NF}')" ; DIR_RCLONE="$(echo "${BACKUP}" | awk -F":" '{print $2}'):${DIR_LOCAL}" ; DIR_ONEDRIVE="${DIR_LOCAL}" ; DIR_BAIDUPAN="${DIR_LOCAL}" #选择网盘与网盘路径
@@ -84,7 +84,7 @@ LIVE_STATUS=0
 #ISLIVE_YOUTUBE=0
 while true; do
 	while true; do
-		TURELOOPINTERVAL=$((10#$(date +%N)%20 + LOOPINTERVAL)) 
+		TURELOOPINTERVAL=$((10#$(date +%N)%$RANTIME+LOOPINTERVAL)) 
 		# 此處的含義：%20為隨機時間添加的閾值，此處添加的隨機時間為0-19，如果填寫%10則是0-9，以此類推
 		# 10#為轉換成十進位，因為使用的是時間的納秒作為隨機，所以可能會出現00開頭的情況讓系統認為是二進位
 		LOG_PREFIX=$(date +"[%Y-%m-%d %H:%M:%S]") ; echo "${LOG_PREFIX} metadata ${FULL_URL}"
