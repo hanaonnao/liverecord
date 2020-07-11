@@ -1,5 +1,20 @@
 # 寫在開頭
   * 此Forked或許會較與原版有所改動，並且不會及時更新bug，如有需求請各位移步原作者[lovezzzxxx/liverecord](https://github.com/lovezzzxxx/liverecord)
+  
+ # 快速導航
+- [功能介紹](#功能介紹)
+- [安裝方法](#安裝方法)
+    + [一鍵安裝](#一鍵安裝)
+    + [環境依賴](#環境依賴)
+- [使用方法](#使用方法)
+    + [方法](#方法)
+    + [示例](#示例)
+    + [參數說明](#參數說明)
+- [可選擇設置](#可選擇設置)
+  * [Youtube可選功能 - Cookies.txt檔案](#youtube可選功能---cookiestxt檔案)
+    + [__如何生成Cookies.txt__](#如何生成Cookiestxt)
+    + [__如何使用__](#如何使用)
+  
 
 # 功能介紹
   * record.sh為自動錄播腳本。支援youtube頻道、twitcast頻道、twitch頻道、openrec頻道、niconico生放送、niconico社區、niconico頻道（支援登錄niconico帳號進行錄製）、mirrativ頻道、reality頻道、17live頻道、chaturbate頻道、bilibili頻道、streamlink支援的直播網址、ffmpeg支援的m3u8位址。bilibili錄製支援在上述頻道有直播時不進行錄製，從而簡單的排除轉播的錄製；支援使用代理錄製bilibili直播。支持定時分段。支持rclone上傳、onedrive上傳(含世紀互聯版)、百度雲上傳；支持可指定次數的上傳出錯重試；支援根據上傳結果選擇是否保留本地檔。
