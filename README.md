@@ -1,5 +1,6 @@
 # 寫在開頭
-  * 此Forked或許會較與原版有所改動，並且不會及時更新bug，如有需求請各位移步原作者[lovezzzxxx/liverecord](https://github.com/lovezzzxxx/liverecord)
+  * 此Forked或許會較與原版有所改動，並且不會及時更新bug，如有需求請各位移步原作者[lovezzzxxx/liverecord](https://github.com/lovezzzxxx/liverecord)  
+ __如果您需要简体字使用说明请点击[此处](https://github.com/hanaonnao/liverecord/blob/master/res/Readme(zh-CN).md)__
   
  # 快速導航
 - [功能介紹](#功能介紹)
