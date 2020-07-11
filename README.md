@@ -12,8 +12,8 @@
     + [參數說明](#參數說明)
 - [可選擇設置](#可選擇設置)
   * [Youtube可選功能 - Cookies.txt檔案](#youtube可選功能---cookiestxt檔案)
-    + [__如何生成Cookies.txt__](#如何生成Cookiestxt)
-    + [__如何使用__](#如何使用)
+    + [如何生成Cookies.txt](#如何生成Cookiestxt)
+    + [如何使用](#如何使用)
   
 
 # 功能介紹
