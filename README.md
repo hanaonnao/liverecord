@@ -38,7 +38,7 @@
 ### 環境依賴
 此處列舉自動錄播腳本運行所需的所有程式，如果一鍵腳本安裝失敗或希望手動安裝環境可以參考  
   * 自動錄播腳本，安裝方法為`mkdir record ; wget -O "record/record.sh" "https://github.com/hanaonnao/liverecord/raw/master/record.sh" ; chmod +x record/record.sh`
-  * [ffmpeg](https://github.com/FFmpeg/FFmpeg)，安裝方法為`sudo apt install ffmpeg`。否則無法使用除了youtube、twitcast、twitcastpy、nicolv、nicoco、nicoch、bilibili、bilibiliproxy以外的參數。
+  * [ffmpeg](https://github.com/FFmpeg/FFmpeg)，安裝方法為`sudo apt install ffmpeg`。否則無法使用除了youtube、twitcast、twitcastpy、nicolv、nicoco、nicoch、bilibili、bilibiliproxy以外的參數。如果需要最新的版本可以使用一鍵腳本進行安裝，亦或是[參考此處](https://www.johnvansickle.com/ffmpeg/faq/)。
   * [streamlink](https://github.com/streamlink/streamlink)(基於python3)，安裝方法為`pip3 install streamlink`。否則無法使用youtube、youtubeffmpeg、twitch、streamlink、17live參數。
   * [livedl](https://github.com/hanaonnao/livedl)(基於go，原項目[himananiito/livedl](https://github.com/himananiito/livedl)已失效)，具體編譯安裝方法可以參考作者的說明， __請將編譯完成的livedl檔放置于運行時命令列所在目錄的livedl/資料夾內__ 。否則無法使用twitcast、nicolv、nicoco、nicoch參數。
   * [record_twitcast.py文件](https://github.com/lovezzzxxx/liverecord/blob/master/record_twitcast.py)(基於python3 websocket庫)，安裝方法為`mkdir record ; wget -O "record/record_twitcast.py" "https://github.com/lovezzzxxx/liverecord/raw/master/record_twitcast.py" ; chmod +x "record/record_twitcast.py"`， __如果手動安裝請將record_twitcast.py檔放置于運行時命令列所在目錄的record/資料夾內並給予可執行許可權即可__ 。否則無法使用twitcastpy參數。
