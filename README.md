@@ -34,7 +34,7 @@
 
 # 使用方法
 ### 方法
-`./record.sh youtube|youtubeffmpeg|twitcast|twitcastffmpeg|twitcastpy|twitch|openrec|nicolv[:用戶名,密碼]|nicoco[:用戶名,密碼]|nicoch[:用戶名,密碼]|mirrativ|reality|17live|chaturbate|bilibili|bilibiliproxy[,代理ip:代理埠]|streamlink|m3u8 頻道號碼 [best|其他清晰度] [loop|once|視頻分段時間] [10,10,1|迴圈檢測間隔,最短錄製間隔,錄製開始所需連續檢測開播次數] [record_video/other|其他本地目錄] [nobackup|rclone:網盤名稱:|onedrive|baidupan[重試次數][keep|del]] [noexcept|排除轉播的youtube頻道號碼] [noexcept|排除轉播的twitcast頻道號碼] [noexcept|排除轉播的twitch頻道號碼] [noexcept|排除轉播的openrec頻道號碼] [noexcept|排除轉播的nicolv頻道號碼] [noexcept|排除轉播的nicoco頻道號碼] [noexcept|排除轉播的nicoch頻道號碼] [noexcept|排除轉播的mirrativ頻道號碼] [noexcept|排除轉播的reality頻道號碼] [noexcept|排除轉播的17live頻道號碼]  [noexcept|排除轉播的chaturbate頻道號碼] [noexcept|排除轉播的streamlink支援的頻道網址]`
+`./record.sh youtube|youtubeffmpeg|twitcast|twitcastffmpeg|twitcastpy|twitch|openrec|nicolv[:用戶名,密碼]|nicoco[:用戶名,密碼]|nicoch[:用戶名,密碼]|mirrativ|reality|17live|chaturbate|bilibili|bilibiliproxy[,代理ip:代理埠]|streamlink|m3u8 頻道號碼 [best|其他清晰度] [loop|once|視頻分段時間] [10,10,1,20|迴圈檢測間隔,最短錄製間隔,錄製開始所需連續檢測開播次數,每次檢測隨機增加時間的範圍] [record_video/other|其他本地目錄] [nobackup|rclone:網盤名稱:|onedrive|baidupan[重試次數][keep|del]] [noexcept|排除轉播的youtube頻道號碼] [noexcept|排除轉播的twitcast頻道號碼] [noexcept|排除轉播的twitch頻道號碼] [noexcept|排除轉播的openrec頻道號碼] [noexcept|排除轉播的nicolv頻道號碼] [noexcept|排除轉播的nicoco頻道號碼] [noexcept|排除轉播的nicoch頻道號碼] [noexcept|排除轉播的mirrativ頻道號碼] [noexcept|排除轉播的reality頻道號碼] [noexcept|排除轉播的17live頻道號碼]  [noexcept|排除轉播的chaturbate頻道號碼] [noexcept|排除轉播的streamlink支援的頻道網址]`
 
 ### 示例
   * 使用默認參數錄製https://www.youtube.com/channel/UCWCc8tO-uUl_7SJXIKJACMw   
@@ -43,8 +43,8 @@
   * 使用ffmpeg錄製https://www.youtube.com/channel/UCWCc8tO-uUl_7SJXIKJACMw ，依次獲取1080p 720p 480p 360p worst中第一個可用的清晰度，在檢測到直播並進行一次錄製後終止，間隔30秒檢測，錄影保存於record_video/mea資料夾中並在錄製完成後自動上傳到rclone中名稱為vps的網盤和百度雲網盤的相同路徑 如果出錯則重試最多三次 上傳結束後根據上傳情況刪除本地錄影，如果上傳失敗則會保留本地錄影  
 `./record.sh youtubeffmpeg "UCWCc8tO-uUl_7SJXIKJACMw" 1080p,720p,480p,360p,worst once 30 "record_video/mea" rclone:vps:baidupan3`  
 
-  * 使用ffmpeg錄製https://ch.nicovideo.jp/kurorin2525 ，直接獲取最佳的清晰度，重複檢測到直播並進行錄製，間隔30秒檢測，每次錄製從開始到結束最短間隔10秒，連續檢測開播次數為5才開始錄製，錄影保存於record_video/kurorin_nico資料夾中並在錄製完成後自動上傳到onedrive的相同路徑 如果出錯則重試最多三次 上傳結束後根據上傳情況刪除本地錄影，如果上傳失敗則會保留本地錄影  
-`./record.sh nicoch:nico登入賬號,nico登入密碼 kurorin2525 best loop 30,10,5 record_video/kurorin_nico onedrive3`  
+  * 使用ffmpeg錄製https://ch.nicovideo.jp/kurorin2525 ，直接獲取最佳的清晰度，重複檢測到直播並進行錄製，間隔30秒檢測，每次錄製從開始到結束最短間隔10秒，連續檢測開播次數為5才開始錄製，每次檢測隨機增加0-9秒，錄影保存於record_video/kurorin_nico資料夾中並在錄製完成後自動上傳到onedrive的相同路徑 如果出錯則重試最多三次 上傳結束後根據上傳情況刪除本地錄影，如果上傳失敗則會保留本地錄影  
+`./record.sh nicoch:nico登入賬號,nico登入密碼 kurorin2525 best loop 30,10,5,10 record_video/kurorin_nico onedrive3`  
 
   * 後臺運行，使用代理伺服器127.0.0.1:1080錄製https://live.bilibili.com/12235923 ，最高清晰度，迴圈檢測並在錄製進行7200秒時分段，間隔30秒檢測 每次錄製從開始到結束最短間隔5秒，錄影保存於record_video/mea資料夾中並在錄製完成後自動上傳到rclone中名稱為vps的網盤和onedrive和百度雲網盤的相同路徑 如果出錯則重試最多三次 上傳完成後無論成功與否都保留本地錄影，在https://www.youtube.com/channel/UCWCc8tO-uUl_7SJXIKJACMw https://twitcasting.tv/kaguramea_vov 有直播時不進行錄製，log記錄保存於mea_bilibili.log文件  
 `nohup ./record.sh bilibiliproxy,127.0.0.1:1080 "12235923" best 7200 30,5 "record_video/mea_bilibili" rclone:vps:onedrivebaidupan3keep "UCWCc8tO-uUl_7SJXIKJACMw" "kaguramea_vov" > mea_bilibili.log &`  
