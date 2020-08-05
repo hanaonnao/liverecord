@@ -50,7 +50,9 @@
 
 # 使用方法
 ### 方法
-`./record.sh youtube|youtubeffmpeg|twitcast|twitcastffmpeg|twitcastpy|twitch|openrec|nicolv[:用戶名,密碼]|nicoco[:用戶名,密碼]|nicoch[:用戶名,密碼]|mirrativ|reality|17live|chaturbate|bilibili|bilibiliproxy[,代理ip:代理埠]|streamlink|m3u8 頻道號碼 [best|其他清晰度] [loop|once|視頻分段時間] [10,10,1,20|迴圈檢測間隔,最短錄製間隔,錄製開始所需連續檢測開播次數,每次檢測隨機增加時間的範圍] [record_video/other|其他本地目錄] [nobackup|rclone:網盤名稱:|onedrive|baidupan[重試次數][keep|del]] [noexcept|排除轉播的youtube頻道號碼] [noexcept|排除轉播的twitcast頻道號碼] [noexcept|排除轉播的twitch頻道號碼] [noexcept|排除轉播的openrec頻道號碼] [noexcept|排除轉播的nicolv頻道號碼] [noexcept|排除轉播的nicoco頻道號碼] [noexcept|排除轉播的nicoch頻道號碼] [noexcept|排除轉播的mirrativ頻道號碼] [noexcept|排除轉播的reality頻道號碼] [noexcept|排除轉播的17live頻道號碼]  [noexcept|排除轉播的chaturbate頻道號碼] [noexcept|排除轉播的streamlink支援的頻道網址]`
+`./record.sh youtube|youtubeffmpeg|twitcast|twitcastffmpeg|twitcastpy|twitch|openrec|nicolv[:用戶名,密碼]|nicoco[:用戶名,密碼]|nicoch[:用戶名,密碼]|mirrativ|reality|17live|chaturbate|bilibili|bilibiliproxy[,代理ip:代理埠]|streamlink|m3u8 頻道號碼 [best|其他清晰度] [loop|once|視頻分段時間] [10,10,1,20|迴圈檢測間隔,最短錄製間隔,錄製開始所需連續檢測開播次數,每次檢測隨機增加時間的範圍] [record_video/other|其他本地目錄] [nobackup|rclone:網盤名稱:|onedrive|baidupan[重試次數][keep|del]] [noexcept|排除轉播的youtube頻道號碼] [noexcept|排除轉播的twitcast頻道號碼] [noexcept|排除轉播的twitch頻道號碼] [noexcept|排除轉播的openrec頻道號碼] [noexcept|排除轉播的nicolv頻道號碼] [noexcept|排除轉播的nicoco頻道號碼] [noexcept|排除轉播的nicoch頻道號碼] [noexcept|排除轉播的mirrativ頻道號碼] [noexcept|排除轉播的reality頻道號碼] [noexcept|排除轉播的17live頻道號碼]  [noexcept|排除轉播的chaturbate頻道號碼] [noexcept|排除轉播的streamlink支援的頻道網址]`  
+__請注意，請您務必在record.sh目錄下運行record.sh。即便您使用後台運作也請您在目錄下運行。  
+否則會出現找不到檔案的情況__  
 
 ### 示例
   * 使用默認參數錄製https://www.youtube.com/channel/UCWCc8tO-uUl_7SJXIKJACMw   
@@ -64,6 +66,8 @@
 
   * 後臺運行，使用代理伺服器127.0.0.1:1080錄製https://live.bilibili.com/12235923 ，最高清晰度，迴圈檢測並在錄製進行7200秒時分段，間隔30秒檢測 每次錄製從開始到結束最短間隔5秒，錄影保存於record_video/mea資料夾中並在錄製完成後自動上傳到rclone中名稱為vps的網盤和onedrive和百度雲網盤的相同路徑 如果出錯則重試最多三次 上傳完成後無論成功與否都保留本地錄影，在https://www.youtube.com/channel/UCWCc8tO-uUl_7SJXIKJACMw https://twitcasting.tv/kaguramea_vov 有直播時不進行錄製，log記錄保存於mea_bilibili.log文件  
 `nohup ./record.sh bilibiliproxy,127.0.0.1:1080 "12235923" best 7200 30,5 "record_video/mea_bilibili" rclone:vps:onedrivebaidupan3keep "UCWCc8tO-uUl_7SJXIKJACMw" "kaguramea_vov" > mea_bilibili.log &`  
+__請注意，請您務必在record.sh目錄下運行record.sh。即便您使用後台運作也請您在目錄下運行。  
+否則會出現找不到檔案的情況__  
 
 
 ### 參數說明
@@ -144,6 +148,8 @@ __處理（可跳過)__
 
 在準備好cookies.txt檔案后,請您將Cookies.txt放在與存放record.sh相同的資料夾內。  
 直接運行record.sh可以檢查是否生效。  
+__請注意，請您務必在record.sh目錄下運行record.sh。  
+如果您在別的目錄下運行record.sh的話將會直接出現未登入的情況，即便您已經設置好Cookies.txt__  
 如果已經生效：
 ```
 [root@hanaon record]# ls
