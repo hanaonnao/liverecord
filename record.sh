@@ -101,8 +101,17 @@ while true; do
 			if (wget -q -O- "https://twitcasting.tv/streamserver.php?target=${PART_URL}&mode=client" | grep -q '"live":true'); then let LIVE_STATUS++; else LIVE_STATUS=0; fi
 		fi
 		if [[ "${1}" == "twitch" ]]; then
-			STREAM_URL=$(streamlink --stream-url "${FULL_URL}" "${FORMAT}")
-			if (echo "${STREAM_URL}" | grep -q ".m3u8"); then let LIVE_STATUS++; else LIVE_STATUS=0; fi
+			STREAM_CHEAK=$(streamlink "${FULL_URL}" "${FORMAT}")
+			if (echo "${STREAM_CHEAK}" | grep -q "Available streams"); then
+				if (echo "${STREAM_CHEAK}" | grep -q "switching to"); then 
+					LIVE_STATUS=0; 
+				else 
+					let LIVE_STATUS++;
+					STREAM_URL=$(streamlink --stream-url "${FULL_URL}" "${FORMAT}");
+					fi
+			else 
+				LIVE_STATUS=0;
+			fi
 		fi
 		if [[ "${1}" == "openrec" ]]; then
 			LIVE_URL=$(wget -q -O- "${FULL_URL}" | grep -o 'href="https://www.openrec.tv/live/.*" class' | head -n 1 | awk -F'"' '{print $2}')
