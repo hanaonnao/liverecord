@@ -90,7 +90,7 @@ while true; do
 		LOG_PREFIX=$(date +"[%Y-%m-%d %H:%M:%S]") ; echo "${LOG_PREFIX} metadata ${FULL_URL}"
 		if [[ "${1}" == "youtube"* ]]; then
 			LOG_PREFIX=$(date +"[%Y-%m-%d %H:%M:%S]") ; echo "${LOG_PREFIX} metadata RANLOOPINTERVAL=${TURELOOPINTERVAL}"
-				if (wget -x --load-cookies cookies.txt -q -O- "${FULL_URL}" | grep "ytplayer" | grep -q '\\"isLive\\":true'); then
+				if (wget -x --load-cookies cookies.txt -q -O- "${FULL_URL}" | grep "ytplayer" | grep -q '\"isLive\":true'); then
 					let LIVE_STATUS++ ;
 				else
 					LIVE_STATUS=0 ; 
@@ -101,17 +101,8 @@ while true; do
 			if (wget -q -O- "https://twitcasting.tv/streamserver.php?target=${PART_URL}&mode=client" | grep -q '"live":true'); then let LIVE_STATUS++; else LIVE_STATUS=0; fi
 		fi
 		if [[ "${1}" == "twitch" ]]; then
-			STREAM_CHEAK=$(streamlink "${FULL_URL}" "${FORMAT}")
-			if (echo "${STREAM_CHEAK}" | grep -q "Available streams"); then
-				if (echo "${STREAM_CHEAK}" | grep -q "switching to"); then 
-					LIVE_STATUS=0; 
-				else 
-					let LIVE_STATUS++;
-					STREAM_URL=$(streamlink --stream-url "${FULL_URL}" "${FORMAT}");
-					fi
-			else 
-				LIVE_STATUS=0;
-			fi
+			STREAM_URL=$(streamlink --stream-url "${FULL_URL}" "${FORMAT}")
+			if (echo "${STREAM_URL}" | grep -q ".m3u8"); then let LIVE_STATUS++; else LIVE_STATUS=0; fi
 		fi
 		if [[ "${1}" == "openrec" ]]; then
 			LIVE_URL=$(wget -q -O- "${FULL_URL}" | grep -o 'href="https://www.openrec.tv/live/.*" class' | head -n 1 | awk -F'"' '{print $2}')
@@ -239,7 +230,7 @@ while true; do
 	
 	
 	
-	if [[ "${1}" == "youtube"* ]]; then ID=$(wget -x --load-cookies cookies.txt -q -O- "${FULL_URL}" | grep -o '\\"liveStreamabilityRenderer\\":{\\"videoId\\":\\".*\\"' | head -n 1 | sed 's/\\//g' | awk -F'"' '{print $6}') ; FNAME="youtube_${PART_URL}_$(date +"%Y%m%d_%H%M%S")_${ID}.ts"; echo "225";fi
+	if [[ "${1}" == "youtube"* ]]; then ID=$(wget -x --load-cookies cookies.txt -q -O- "${FULL_URL}" | grep -o '\"liveStreamabilityRenderer\":{\"videoId\":\".*\"' | head -n 1 | awk -F'"' '{print $6}') ; FNAME="youtube_${PART_URL}_$(date +"%Y%m%d_%H%M%S")_${ID}.ts"; echo "225";fi
 	if [[ "${1}" == "youtubeffmpeg" ]]; then STREAM_URL=$(streamlink --http-cookie "${Cookies1}" --http-cookie "${Cookies2}" --http-cookie "${Cookies3}" --stream-url "${FULL_URL}" "${FORMAT}"); fi
 	if [[ "${1}" == "twitcast"* ]]; then ID=$(wget -q -O- "https://twitcasting.tv/streamserver.php?target=${PART_URL}&mode=client" | grep -o '"id":[0-9]*' | awk -F':' '{print $2}') ; DLNAME="${PART_URL/:/：}_${ID}.ts" ; FNAME="twitcast_${PART_URL/:/：}_$(date +"%Y%m%d_%H%M%S")_${ID}.ts"; fi
 	if [[ "${1}" == "twitcastffmpeg" ]]; then STREAM_URL=$(wget -q -O- "https://twitcasting.tv/${PART_URL}/metastream.m3u8?mode=source" | grep ".m3u8" | head -n 1); fi
